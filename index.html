@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Melon: Glannot Challenges</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      /* ===== GLOBAL COLORS ===== */
+      --bg-main: #02030a;
+      --bg-card-soft: #050812;
+      --line: #0aff60;
+      --line-soft: rgba(10, 255, 96, 0.4);
+      --text-main: #fdfdfd;
+      --text-sub: #a8b3c5;
+      --radius-card: 18px;
+      --transition-fast: 0.22s ease-out;
+      --transition-med: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+      /* ===== DAVID vs GOLIATH CARD CONFIG ===== */
+      --david-card-width: 220px;
+      --david-card-right: 24px;
+      --david-card-bottom: 24px;
+      --david-icon-width: 110px;
+      --david-icon-height: 55px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #071021 0, #02030a 52%, #000000 100%);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+
+    .page {
+      max-width: 1280px;
+      width: 100%;
+      position: relative;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .eyebrow {
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--line);
+      margin-bottom: 10px;
+    }
+
+    .title {
+      font-size: clamp(30px, 4.4vw, 40px);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: var(--text-sub);
+    }
+
+    /* ===== GRID ===== */
+    .grid {
+      margin-top: 32px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px 24px;
+    }
+
+    .challenge-card.is-center {
+      grid-column: 1 / -1;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .challenge-card.is-center {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    /* ===== CARD ===== */
+    .challenge-card {
+      position: relative;
+      border-radius: var(--radius-card);
+      padding: 18px 22px;
+      background:
+        radial-gradient(circle at top left, rgba(10, 255, 96, 0.12), transparent 60%),
+        var(--bg-card-soft);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      overflow: hidden;
+      cursor: default;
+      transition:
+        transform var(--transition-med),
+        box-shadow var(--transition-med),
+        border-color var(--transition-med),
+        background var(--transition-med);
+      box-shadow: 0 0 0 0 transparent;
+    }
+
+    .challenge-card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      pointer-events: none;
+      background: radial-gradient(circle at top, rgba(10, 255, 96, 0.18), transparent 60%);
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+
+    .challenge-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(10, 255, 96, 0.14), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(10, 255, 96, 0.08), transparent 60%);
+      mix-blend-mode: screen;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-med);
+    }
+
+    .challenge-card:hover {
+      transform: translateY(-8px);
+      box-shadow:
+        0 0 32px rgba(10, 255, 96, 0.22),
+        0 0 65px rgba(0, 0, 0, 0.9);
+      border-color: rgba(10, 255, 96, 0.6);
+    }
+
+    .challenge-card:hover::before {
+      opacity: 1;
+    }
+
+    .challenge-card:hover::after {
+      opacity: 0.9;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .icon-circle {
+      position: relative;
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0%, #20ff93 0, #0aff60 36%, #00b44e 76%, #00823c 100%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow:
+        0 0 20px rgba(10, 255, 96, 0.6),
+        0 0 36px rgba(10, 255, 96, 0.3);
+      transition:
+        transform var(--transition-med),
+        box-shadow var(--transition-med),
+        background var(--transition-med);
+    }
+
+    .challenge-card:hover .icon-circle {
+      transform: scale(1.05) translateY(-1px);
+      box-shadow:
+        0 0 30px rgba(10, 255, 96, 0.9),
+        0 0 62px rgba(10, 255, 96, 0.6);
+    }
+
+    .icon-svg {
+      width: 22px;
+      height: 22px;
+      stroke: #02030a;
+      stroke-width: 1.6;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      margin-bottom: 2px;
+    }
+
+    .card-subtitle {
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    /* ===== 3 CARD KEY ===== */
+    .challenge-card.is-key {
+      border-color: rgba(10, 255, 96, 0.9);
+      box-shadow:
+        0 0 0 1px rgba(10, 255, 96, 0.4),
+        0 0 40px rgba(10, 255, 96, 0.55),
+        0 0 80px rgba(0, 0, 0, 0.9);
+      background:
+        radial-gradient(circle at top left, rgba(10, 255, 96, 0.28), transparent 65%),
+        var(--bg-card-soft);
+      transform: translateY(-3px) scale(1.01);
+      animation: neonPulseStrong 2s ease-in-out infinite;
+    }
+
+    .challenge-card.is-key .icon-circle {
+      background: radial-gradient(circle at 30% 0%, #b5ffd6 0, #4effb5 35%, #14e977 72%, #00bf57 100%);
+      box-shadow:
+        0 0 30px rgba(10, 255, 96, 0.95),
+        0 0 70px rgba(10, 255, 96, 0.6);
+    }
+
+    .challenge-card.is-key:hover {
+      transform: translateY(-10px) scale(1.04);
+    }
+
+    .badge-key {
+      position: absolute;
+      top: 16px;
+      right: 22px;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(10, 255, 96, 1);
+      background: radial-gradient(circle at top, rgba(10, 255, 96, 0.22), rgba(2, 5, 8, 0.96));
+      color: var(--line);
+      box-shadow:
+        0 0 18px rgba(10, 255, 96, 0.9),
+        0 0 30px rgba(10, 255, 96, 0.6);
+    }
+
+    @keyframes neonPulseStrong {
+      0%, 100% {
+        box-shadow:
+          0 0 0 1px rgba(10, 255, 96, 0.4),
+          0 0 40px rgba(10, 255, 96, 0.55),
+          0 0 80px rgba(0, 0, 0, 0.9);
+      }
+      50% {
+        box-shadow:
+          0 0 0 1px rgba(10, 255, 96, 0.9),
+          0 0 70px rgba(10, 255, 96, 0.95),
+          0 0 110px rgba(0, 0, 0, 1);
+      }
+    }
+
+    /* CARD CUỐI: CĂN GIỮA NỘI DUNG */
+    .challenge-card.is-center .card-header {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 14px;
+    }
+
+    .challenge-card.is-center .card-header > div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ===== DAVID vs GOLIATH CARD (anchor clickable) ===== */
+    .david-card {
+      position: fixed;
+      right: var(--david-card-right);
+      bottom: var(--david-card-bottom);
+      width: var(--david-card-width);
+      border-radius: 16px;
+      padding: 14px 16px 16px;
+      background:
+        radial-gradient(circle at top left, rgba(10, 255, 96, 0.3), transparent 55%),
+        rgba(3, 8, 18, 0.96);
+      border: 1px solid rgba(10, 255, 96, 0.85);
+      box-shadow:
+        0 0 36px rgba(10, 255, 96, 0.8),
+        0 0 80px rgba(0, 0, 0, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--text-main);
+      transition:
+        transform var(--transition-med),
+        box-shadow var(--transition-med),
+        border-color var(--transition-med);
+    }
+
+    .david-card:hover {
+      transform: translateY(-4px);
+      box-shadow:
+        0 0 46px rgba(10, 255, 96, 0.95),
+        0 0 110px rgba(0, 0, 0, 1);
+      border-color: rgba(10, 255, 96, 1);
+    }
+
+    .david-icon {
+      width: var(--david-icon-width);
+      height: var(--david-icon-height);
+    }
+
+    .david-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .david-subtitle {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    @media (max-width: 720px) {
+      .david-card {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <div class="eyebrow">KEY HURDLES FOR INTERNATIONAL EXPANSION</div>
+      <h1 class="title">MELON: GLANNOT CHALLENGES</h1>
+      <p class="subtitle">
+        Structural constraints that limit Melon’s ability to scale outside Korea.
+      </p>
+    </header>
+
+    <section class="grid" aria-label="Melon global expansion challenges">
+      <!-- 1. Domestic-First Strategy -->
+      <article class="challenge-card">
+        <div class="card-header">
+          <div class="icon-circle">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="7.5"></circle>
+              <ellipse cx="12" cy="12" rx="3.2" ry="7.5"></ellipse>
+              <line x1="4.5" y1="12" x2="19.5" y2="12"></line>
+            </svg>
+          </div>
+          <div>
+            <div class="card-title">Domestic-First Strategy</div>
+            <div class="card-subtitle">Korea-Centric Focus</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 2. Licensing Barriers (KEY) -->
+      <article class="challenge-card is-key">
+        <span class="badge-key">KEY BOTTLENECK</span>
+        <div class="card-header">
+          <div class="icon-circle">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <polyline points="9 6 15 4.5 15 11"></polyline>
+              <circle cx="9" cy="13.5" r="1.8"></circle>
+              <rect x="15.5" y="12.5" width="5" height="4.8" rx="1"></rect>
+              <path d="M17.2 12.5v-1.7a2 2 0 0 1 4 0v1.7"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="card-title">Licensing Barriers</div>
+            <div class="card-subtitle">Complex Rights</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 3. Not Global-Friendly Business Model -->
+      <article class="challenge-card">
+        <div class="card-header">
+          <div class="icon-circle">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <path d="M7 7h4.2M7 7V3.5M7 7a5.5 5.5 0 0 1 9.5-2.9"></path>
+              <path d="M17 17h-4.2M17 17V20.5M17 17a5.5 5.5 0 0 1-9.5 2.9"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="card-title">Not Global-Friendly Business Model</div>
+            <div class="card-subtitle">Local Payment / Content</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 4. Korea-Centric AI & Data -->
+      <article class="challenge-card">
+        <div class="card-header">
+          <div class="icon-circle">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <rect x="7" y="7" width="10" height="10" rx="2"></rect>
+              <rect x="10" y="10" width="4" height="4" rx="0.8"></rect>
+              <path d="M12 2.5v3"></path>
+              <path d="M12 18.5v3"></path>
+              <path d="M2.5 12h3"></path>
+              <path d="M18.5 12h3"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="card-title">Korea-Centric AI &amp; Data</div>
+            <div class="card-subtitle">Language / Cultural Data</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 5. Weak Global Brand Presence (KEY) -->
+      <article class="challenge-card is-key">
+        <span class="badge-key">KEY BOTTLENECK</span>
+        <div class="card-header">
+          <div class="icon-circle">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <path d="M8.5 7.5c0-1.7 1.3-3 3-3s3 1.3 3 3c0 2.5-3 5-3 5s-3-2.5-3-5z"></path>
+              <circle cx="11.5" cy="7.5" r="0.9" fill="#02030a"></circle>
+              <path d="M6 17h11"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="card-title">Weak Global Brand Presence</div>
+            <div class="card-subtitle">Unknown Internationally</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 6. Kakao Strategy -->
+      <article class="challenge-card">
+        <div class="card-header">
+          <div class="icon-circle">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <rect x="4" y="7" width="4.4" height="8.5" rx="0.8"></rect>
+              <rect x="9.4" y="7" width="4.4" height="8.5" rx="0.8"></rect>
+              <path d="M15 11h2.8c1.1 0 2 0.9 2 2v0.5"></path>
+              <polyline points="18.5 15.5 20.2 13.8 18.5 12.1"></polyline>
+            </svg>
+          </div>
+          <div>
+            <div class="card-title">Kakao Strategy</div>
+            <div class="card-subtitle">Content Global, Platform Local</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 7. Saturated Global Market (KEY + CENTER) -->
+      <article class="challenge-card is-key is-center">
+        <span class="badge-key">KEY BOTTLENECK</span>
+        <div class="card-header">
+          <div class="icon-circle">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="7.5"></circle>
+              <circle cx="9" cy="10.5" r="1.6"></circle>
+              <circle cx="15" cy="13.5" r="1.6"></circle>
+              <path d="M9.7 11.7l1.9 1.2"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="card-title">Saturated Global Market</div>
+            <div class="card-subtitle">Dominant Competitors</div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- DAVID vs GOLIATH sticker bottom-right (CLICKABLE LINK) -->
+    <a
+      class="david-card"
+      href="https://6b9dc670592243fba51c9051837b2e53-main.projects.builder.my/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <svg class="david-icon" viewBox="0 0 160 80">
+        <line x1="10" y1="70" x2="150" y2="70" stroke="#0aff60" stroke-width="1.4" stroke-linecap="round"/>
+        <!-- David -->
+        <circle cx="40" cy="32" r="6" stroke="#0aff60" stroke-width="2" fill="none"/>
+        <line x1="40" y1="38" x2="40" y2="52" stroke="#0aff60" stroke-width="2" />
+        <line x1="40" y1="44" x2="32" y2="50" stroke="#0aff60" stroke-width="2" />
+        <line x1="40" y1="44" x2="46" y2="48" stroke="#0aff60" stroke-width="2" />
+        <line x1="40" y1="52" x2="34" y2="64" stroke="#0aff60" stroke-width="2" />
+        <line x1="40" y1="52" x2="46" y2="64" stroke="#0aff60" stroke-width="2" />
+        <!-- Slingshot -->
+        <polyline points="50,40 58,36 66,40" stroke="#0aff60" stroke-width="2" fill="none" />
+        <line x1="58" y1="36" x2="60" y2="30" stroke="#0aff60" stroke-width="2" />
+        <!-- Goliath -->
+        <circle cx="115" cy="26" r="9" stroke="#0aff60" stroke-width="2" fill="none"/>
+        <line x1="115" y1="35" x2="115" y2="56" stroke="#0aff60" stroke-width="2.4" />
+        <line x1="115" y1="40" x2="102" y2="48" stroke="#0aff60" stroke-width="2.2" />
+        <line x1="115" y1="40" x2="128" y2="46" stroke="#0aff60" stroke-width="2.2" />
+        <line x1="115" y1="56" x2="106" y2="70" stroke="#0aff60" stroke-width="2.4" />
+        <line x1="115" y1="56" x2="124" y2="70" stroke="#0aff60" stroke-width="2.4" />
+      </svg>
+      <div class="david-title">David vs. Goliath</div>
+      <div class="david-subtitle">Uphill Global Battle</div>
+    </a>
+  </main>
+</body>
+</html>
